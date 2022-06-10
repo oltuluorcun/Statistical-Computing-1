@@ -1,4 +1,4 @@
-# Statistical Computing 1 Courses
+# Statistical Computing 1 Course
 
 This repo contains recitations notes for Statistical Computing 1 course given by Statistics Department, Middle East Technichal University.
 

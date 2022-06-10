@@ -1,0 +1,431 @@
+---
+title: "Stat 291 - Recitation 5"
+author: "Orçun Oltulu"
+date: "26 / 11 / 2021"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+linkcolor: black
+geometry: margin = 1.05in
+fontsize: 12pt
+---
+
+```{r include = FALSE}
+knitr::opts_chunk$set(echo=FALSE,results='hide',fig.show = 'hide')
+```
+
+# Last Week: 
+
+Recall the last exercise from Recitation 4. 
+
+Load 'Credit' data set from ISLR package. Read the document for the data set; '?Credit'.
+
+```{r echo=TRUE}
+library(ISLR)
+library(dplyr)
+```
+
+### Part A.
+
+Check the first 10 observations of Credit data set.
+
+```{r}
+head(Credit, 10)
+```
+
+### Part B.
+
+Create a subset, new_credit1, for Asian married females. 
+
+```{r}
+new_credit1 <- filter(Credit, 
+                      Gender == "Female", 
+                      Married == "Yes", 
+                      Ethnicity == "Asian")
+
+head(new_credit1,10)
+```
+
+### Part C.
+
+From new_credit1, select only numeric values and create new data frame, new_credit2.
+
+```{r}
+new_credit2 <- select_if(new_credit1, is.numeric)
+head(new_credit2,10)
+```
+
+### Part D.
+
+Find the mean of each numeric value in new_credit2.
+
+```{r}
+summarise_all(new_credit2, mean)
+```
+
+### Part F.
+
+Now, find minimum and maximum Income for Asian males and females separately,
+
+* Filter Asian people, 
+
+* Select only Gender and Income variables, 
+
+* Group them by Gender, 
+
+* Summarize using min and max functions.
+
+```{r}
+new_credit3 <- filter(Credit, Ethnicity == "Asian")
+new_credit3 <- select(new_credit3, Gender, Income)
+new_credit3 <- group_by(new_credit3, Gender)
+
+summarise(new_credit3, 
+          Minimum_Income = min(Income), 
+          Maximum_Income = max(Income)) 
+```
+
+# Reading data files into R:
+
+## Exercise 1:
+
+Read the file 'Table0.txt';
+
+```{r}
+df1 <- read.table("Table0.txt")
+df1
+```
+
+**(a)** Assign names to the columns to Name, Age, Height, Weight and Sex.
+
+```{r}
+colnames(df1) <- c('Name', 'Age', 'Height', 'Weight','Sex');
+df1
+```
+
+**(b)** Change the row names so that they are the same as Name, and remove the variable Name.
+
+```{r}
+row.names(df1) <- df1$Name
+df1$Name <- NULL 
+df1
+```
+
+## Exercise 2:
+
+Read the file 'Table1.txt';
+
+```{r}
+df2 <- read.table("Table1.txt",header=T)
+df2
+```
+
+**(a)** How many rows and columns does it have?
+
+```{r}
+ncol(df2)
+nrow(df2)
+```
+
+**(b)** Reread the file and make the variable Name be the row names. Make sure you read the variable as characters and not as factors.
+
+```{r}
+df2.b <- read.table("Table1.txt", header=T, 
+                    row.names = "Name", 
+                    stringsAsFactors = FALSE)
+df2.b
+
+lapply(df2.b, class)
+```
+
+
+## Exercise 3:
+
+Read the file 'Table2.txt';
+
+```{r}
+df3 <- read.table('Table2.txt', 
+                  header = T, 
+                  skip = 1) 
+```
+
+**(a)** What is the problem with the first and last columns ?
+
+```{r results = TRUE}
+df3
+```
+
+**(b)** How can you fix that problem ?
+
+```{r}
+df3.b <- read.table('Table2.txt', 
+                  header = T, 
+                  skip = 1, quote ="/") 
+df3.b
+```
+
+## Exercise 4:
+
+Read the file 'Table3.txt';
+
+```{r}
+df4 <- read.table('Table3.txt',header = T,skip = 1)
+df4
+```
+
+**(a)** How many missing value does this data set have?
+
+```{r}
+sum(is.na(df4))
+```
+
+**(b)** Assign NA to each 'weird' value. 
+
+```{r}
+df4[3,2] <- df4[5,3] <- df4[6,4] <- NA
+df4
+```
+
+**(c)** Reread the data set but this time make sure you only have 'NA' values rather than {'*','**', "--"}
+
+```{r}
+df4.c <- read.table('Table3.txt', header = T, skip = 1, 
+                    na.strings = c("NA", "*", "**", "--"))
+df4.c
+```
+
+## Exercise 5:
+
+Read the file 'Table4.txt';
+
+```{r}
+df5 <- read.table('Table4.txt',header = T)
+df5
+```
+
+Watch out for the missing values and the decimal separator.
+
+```{r}
+df5.a <- read.table('Table4.txt',header = T,
+                    na.strings = c("NA", "*", "**","--"), 
+                    dec = ",")
+df5.a
+```
+
+## Exercise 6:
+
+Read the file 'Table5.txt';
+
+```{r}
+df6 <- read.table('Table5.txt', header = T)
+df6
+```
+
+Watch out for the missing values and the decimal separator and the separator.
+
+```{r}
+df6.a <- read.table('Table5.txt', header = T, 
+                    na.strings = c(NA, "**", "--"),
+                    dec = ",", sep = ";")
+df6.a
+```
+
+## Exercise 7:
+
+Read the file 'Table6.txt'; 
+
+Check out the file first. Notice that the information is repeated, we only want the first non-repeated ones. Make sure to create only characters not factors this time around. Lastly, we don’t want the comments.
+
+```{r}
+df7.a<- read.table("Table6.txt", skip = 1,header = TRUE,
+                   row.names = "Name",nrow = 7,
+                   comment.char = "@",
+                   stringsAsFactors = FALSE)
+df7.a
+```
+
+## Exercise 8:
+
+Read the file 'states1.csv';
+
+```{r}
+df8 <- read.csv("states1.csv")
+head(df8,10)
+```
+
+**(a)** The names of the states should be the row names.
+
+```{r}
+df8.a <- read.csv("states1.csv",row.names = 1) 
+head(df8.a,10)
+```
+
+**(b)** Check the dimensions of both 'df8' and 'df8.a' data.
+
+```{r}
+dim(df8);dim(df8.a)
+```
+
+## Exercise 9:
+
+Read the file 'states2.csv';
+
+```{r}
+df9 <- read.csv("states2.csv",sep = ";") 
+head(df9,10)
+```
+
+The names of the states should be the row names, watch out for the decimal separator and the separator.
+
+```{r}
+df9.a <- read.csv("states2.csv",row.names = 1,
+                sep = ";",dec = ",") 
+head(df9.a,10)
+```
+
+## Exercise 10:
+
+Read the file 'states3.csv';
+
+```{r}
+df10 <- read.csv("states3.csv",row.names = 1,
+                 sep = ";" ,dec = ",",
+                 na.strings = c(NA, "*"))
+head(df10,10)
+```
+
+Watch out for the same as the last exercise plus the missing values. Add to the previous data set, column-wise.
+
+```{r}
+head(cbind(df8.a, df9.a),10)
+```
+
+
+## Exercise 11:
+
+Read 'iris.Rdata' into R.
+
+```{r}
+load("iris.Rdata")
+```
+
+# Writing data files:
+
+## Exercise 12:
+
+Using following commands create a data frame and write it to 'data1.txt' file. 
+
+```{r echo=TRUE}
+set.seed(291)
+vec1 <- rnorm(15, mean = 5, sd = 2)
+vec2 <- sample(100, size = 15)
+vec3 <- runif(15)
+vec4 <- sample(c("Male","Female"), 
+               size = 15, replace = T)
+
+data <- data.frame(vec1, vec2, vec3, vec4)
+```
+
+```{r}
+write.table(data,file = "data1.txt")
+```
+
+## Exercise 13:
+
+Write the same data set to 'data1.csv' file.  
+
+```{r}
+write.csv(data, "data1.csv")
+```
+
+&nbsp;
+
+Add a new column c(15,25,0.5,"Female") to 'data1.csv' file.
+
+```{r}
+# first way
+data.new <- rbind(data,c(15,25,0.5,"Female"))
+write.csv(data.new, "data1.csv")
+```
+
+```{r}
+# second way
+write.table(data.frame(15,25,0.5,"Female"), "data1.csv", 
+            append = TRUE,sep = ",", col.names=F)
+```
+
+## Exercise 14:
+
+Create an .RData file with same data set, name it 'data1.Rdata'.
+
+```{r}
+save(data, file = "data1.Rdata")
+```
+
+# Reading Data from Web:
+
+## Exercise 15: 
+
+Read .csv data from from github. 
+
+Go to the github repo with the following URL: 
+
+https://github.com/oltuluorcun/Stat291
+
+Read the "data1.csv" file in the repo. 
+
+**Hint:** You have to use the **"Raw"** version of the data set and copy the raw versions URL.
+
+```{r}
+data_github <- read.csv("https://raw.github.com/oltuluorcun/Stat291/main/data1.csv")
+data_github
+```
+
+## Exercise 16: 
+
+**Web scraping with "rvest" package.** 
+
+Go to the following web page where you will see the current F1 standings for both Drivers and Constructors. 
+
+https://www.statsf1.com/en/2021.aspx
+
+Then, using Selector Gagdet, find the 'location' of the tables. 
+
+Finally, do the magic and extract the both tables and read into R.
+
+```{r}
+library(rvest)
+webpage_standing <- "https://www.statsf1.com/en/2021.aspx"
+webpage <- read_html(webpage_standing)
+calendar_html <- html_nodes(webpage, ".yearclass")
+    
+drivers <- html_table(calendar_html[[1]], header = T, na.strings = "-")
+
+drivers <- drivers[-grep("The drivers", drivers$Drivers),]
+
+drivers <- data.frame(drivers)[c(2,25)]
+
+constructors <- html_table(calendar_html[[2]], header = T, na.strings = "-")
+    
+constructors <- constructors[-grep("The constr", constructors$Constructors),]
+
+constructors <- data.frame(constructors)[c(2,25)]
+
+```
+
+```{r}
+head(drivers,10)
+```
+
+
+```{r}
+constructors
+```
+
+&nbsp;
+
+Check out for further info for usage of 'rvest' package: 
+
+https://www.kaggle.com/orcunoltulu1/web-scraping-in-r-rvest-package
+
+
